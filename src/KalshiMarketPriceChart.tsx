@@ -861,7 +861,6 @@ function ChartContent({
   const [compareInputError, setCompareInputError] = useState<string | null>(null);
   const [customCompareMarkets, setCustomCompareMarkets] = useState<CustomCompareMarket[]>([]);
   const [revealProgress, setRevealProgress] = useState(1);
-  const [pageReady, setPageReady] = useState(false);
   const isMobile = useIsMobile();
   const chartRef = useRef<any>(null);
 
@@ -1141,11 +1140,6 @@ function ChartContent({
     const now = Date.now();
     setCustomRangeApplied({ startMs: now - 14 * 24 * 60 * 60 * 1000, endMs: now });
   }, [timeframe, customRangeApplied]);
-
-  useEffect(() => {
-    const t = window.setTimeout(() => setPageReady(true), 40);
-    return () => window.clearTimeout(t);
-  }, []);
 
   useEffect(() => {
     if (candles.length < 2) {
@@ -2063,9 +2057,6 @@ function ChartContent({
         background:
           'radial-gradient(1200px 300px at 15% -50%, rgba(37,99,235,0.4), transparent), radial-gradient(1200px 300px at 85% -50%, rgba(239,68,68,0.4), transparent), linear-gradient(180deg, #0b1220 0%, #0f172a 100%)',
         padding: 14,
-        opacity: pageReady ? 1 : 0,
-        transform: pageReady ? 'translateY(0)' : 'translateY(10px)',
-        transition: 'opacity 650ms ease, transform 650ms ease',
       }}
     >
       <style>{`
