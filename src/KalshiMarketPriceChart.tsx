@@ -488,11 +488,14 @@ async function fetchJsonOrThrow<T>(
     );
   }
 
+  const raw = await response.text();
   try {
-    return (await response.json()) as T;
+    return JSON.parse(raw) as T;
   } catch {
+    const snippet = raw ? `\nResponse: ${raw.slice(0, 300)}` : '';
+    const contentType = response.headers.get('content-type');
     throw new Error(
-      `Invalid JSON while fetching ${requestLabel}.\nURL: ${url.toString()}\nStatus: ${response.status} ${response.statusText}`
+      `Invalid JSON while fetching ${requestLabel}.\nURL: ${url.toString()}\nStatus: ${response.status} ${response.statusText}${contentType ? `\nContent-Type: ${contentType}` : ''}${snippet}`
     );
   }
 }

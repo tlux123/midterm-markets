@@ -23,7 +23,10 @@ function buildTargetUrl(base, pathParam, query) {
 
 export default async function handler(req, res) {
   const url = buildTargetUrl('https://api.elections.kalshi.com', req.query?.path, req.query);
-  const headers = {};
+  const headers = {
+    accept: 'application/json, text/plain;q=0.9, */*;q=0.8',
+    'user-agent': 'Mozilla/5.0 (compatible; MidtermMarketsProxy/1.0; +https://vercel.com)',
+  };
   if (req.headers.authorization) headers.authorization = req.headers.authorization;
   if (req.headers.accept) headers.accept = req.headers.accept;
   if (req.headers['content-type']) headers['content-type'] = req.headers['content-type'];
