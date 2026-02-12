@@ -1,4 +1,4 @@
-import { Component, type ErrorInfo, type ReactNode, useEffect, useMemo, useRef, useState } from 'react';
+ï»¿import { Component, type ErrorInfo, type ReactNode, useEffect, useMemo, useRef, useState } from 'react';
 import {
   QueryClient,
   QueryClientProvider,
@@ -7,8 +7,10 @@ import {
 } from '@tanstack/react-query';
 import {
   Chart as ChartJS,
+  BarController,
   CategoryScale,
   LinearScale,
+  LineController,
   TimeScale,
   PointElement,
   LineElement,
@@ -172,6 +174,8 @@ function hexToRgba(hex: string, alpha: number): string {
 }
 
 ChartJS.register(
+  BarController,
+  LineController,
   CategoryScale,
   LinearScale,
   TimeScale,
@@ -1146,11 +1150,11 @@ function ChartContent({
           const datePart = date && Number.isFinite(date.getTime()) ? date.toLocaleDateString() : null;
           return datePart ? `${h.title} (${datePart})` : h.title;
         })
-        .join('   •   ');
-      return `${base}   •   ${headlineText}`;
+        .join('   â€¢   ');
+      return `${base}   â€¢   ${headlineText}`;
     }
-    if (headlinesQuery.isLoading) return `${base}   •   LOADING POLITICAL HEADLINES`;
-    if (headlinesQuery.isError) return `${base}   •   HEADLINES TEMPORARILY UNAVAILABLE`;
+    if (headlinesQuery.isLoading) return `${base}   â€¢   LOADING POLITICAL HEADLINES`;
+    if (headlinesQuery.isError) return `${base}   â€¢   HEADLINES TEMPORARILY UNAVAILABLE`;
     return base;
   }, [headlines, headlinesQuery.isError, headlinesQuery.isLoading, liveVolume, latestCandle]);
 
@@ -2148,7 +2152,7 @@ function ChartContent({
               {marketTitle || 'Will Democrats Win the House of Representatives?'}
             </h3>
             <p style={{ margin: '4px 0 0 0', color: '#94a3b8', fontSize: 12, fontWeight: 600, textAlign: 'center' }}>
-              {marketId} · project by{' '}
+              {marketId} Â· project by{' '}
               <a
                 href="https://www.linkedin.com/in/tanner-lux-0ba791173/"
                 target="_blank"
@@ -2739,6 +2743,7 @@ export default function KalshiMarketPriceChart(props: KalshiMarketPriceChartProp
     </QueryClientProvider>
   );
 }
+
 
 
 
