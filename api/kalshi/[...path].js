@@ -1,9 +1,13 @@
 function buildTargetUrl(base, pathParam, query) {
-  const parts = Array.isArray(pathParam)
+  const rawParts = Array.isArray(pathParam)
     ? pathParam
     : pathParam
-      ? [pathParam]
+      ? String(pathParam).split('/')
       : [];
+  const parts = rawParts
+    .flatMap((p) => String(p).split('/'))
+    .map((p) => p.trim())
+    .filter(Boolean);
   const encodedPath = parts.map((p) => encodeURIComponent(String(p))).join('/');
   const url = new URL(`${base}/${encodedPath}`);
   for (const [key, value] of Object.entries(query || {})) {
