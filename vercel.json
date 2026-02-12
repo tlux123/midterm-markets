@@ -2,8 +2,24 @@
   "version": 2,
   "routes": [
     {
-      "src": "/api/(.*)",
-      "dest": "/api/$1"
+      "src": "/api/kalshi/(.*)",
+      "dest": "/api/kalshi?path=$1"
+    },
+    {
+      "src": "/api/civic/(.*)",
+      "dest": "/api/civic?path=$1"
+    },
+    {
+      "src": "/api/fred/(.*)",
+      "dest": "/api/fred?path=$1"
+    },
+    {
+      "src": "/api/news/(.*)",
+      "dest": "/api/news?path=$1"
+    },
+    {
+      "src": "/api/ping",
+      "dest": "/api/ping"
     },
     {
       "handle": "filesystem"

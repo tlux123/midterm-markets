@@ -1,15 +1,11 @@
-function buildTargetUrl(base, pathParam, query) {
-  const rawParts = Array.isArray(pathParam)
-    ? pathParam
-    : pathParam
-      ? String(pathParam).split('/')
-      : [];
-  const parts = rawParts
-    .flatMap((p) => String(p).split('/'))
+function buildTargetUrl(base, rawPath, query) {
+  const cleanPath = String(rawPath || '')
+    .split('/')
     .map((p) => p.trim())
-    .filter(Boolean);
-  const encodedPath = parts.map((p) => encodeURIComponent(String(p))).join('/');
-  const url = new URL(`${base}/${encodedPath}`);
+    .filter(Boolean)
+    .map((p) => encodeURIComponent(p))
+    .join('/');
+  const url = new URL(`${base}/${cleanPath}`);
   for (const [key, value] of Object.entries(query || {})) {
     if (key === 'path' || value == null) continue;
     if (Array.isArray(value)) {
@@ -22,12 +18,8 @@ function buildTargetUrl(base, pathParam, query) {
 }
 
 export default async function handler(req, res) {
-  const url = buildTargetUrl('https://api.elections.kalshi.com', req.query?.path, req.query);
-  const headers = {
-    accept: 'application/json, text/plain;q=0.9, */*;q=0.8',
-    'user-agent': 'Mozilla/5.0 (compatible; MidtermMarketsProxy/1.0; +https://vercel.com)',
-  };
-  if (req.headers.authorization) headers.authorization = req.headers.authorization;
+  const url = buildTargetUrl('https://news.google.com', req.query?.path, req.query);
+  const headers = {};
   if (req.headers.accept) headers.accept = req.headers.accept;
   if (req.headers['content-type']) headers['content-type'] = req.headers['content-type'];
 
@@ -41,6 +33,6 @@ export default async function handler(req, res) {
   const body = await upstream.text();
   const contentType = upstream.headers.get('content-type');
   if (contentType) res.setHeader('content-type', contentType);
-  res.setHeader('cache-control', 'no-store');
+  res.setHeader('cache-control', 'public, s-maxage=900, stale-while-revalidate=900');
   return res.status(upstream.status).send(body);
 }
