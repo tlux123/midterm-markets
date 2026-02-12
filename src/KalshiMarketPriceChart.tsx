@@ -1,4 +1,4 @@
-ï»¿import { useEffect, useMemo, useRef, useState } from 'react';
+import { Component, type ErrorInfo, type ReactNode, useEffect, useMemo, useRef, useState } from 'react';
 import {
   QueryClient,
   QueryClientProvider,
@@ -273,6 +273,63 @@ type RssHeadline = {
   link: string;
   pubDate: string;
 };
+type ChartErrorBoundaryProps = {
+  children: ReactNode;
+};
+
+type ChartErrorBoundaryState = {
+  errorMessage: string | null;
+};
+
+class ChartErrorBoundary extends Component<ChartErrorBoundaryProps, ChartErrorBoundaryState> {
+  constructor(props: ChartErrorBoundaryProps) {
+    super(props);
+    this.state = { errorMessage: null };
+  }
+
+  static getDerivedStateFromError(error: Error): ChartErrorBoundaryState {
+    return { errorMessage: error?.message || 'Unknown render error' };
+  }
+
+  componentDidCatch(error: Error, info: ErrorInfo) {
+    console.error('Chart render error:', error, info);
+  }
+
+  render() {
+    if (this.state.errorMessage) {
+      return (
+        <div
+          style={{
+            width: '100vw',
+            height: '100vh',
+            padding: 16,
+            background: '#0f172a',
+            color: '#fecaca',
+            fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace',
+            overflow: 'auto',
+          }}
+        >
+          <div style={{ fontSize: 16, fontWeight: 700, marginBottom: 8 }}>Chart crashed during render</div>
+          <pre
+            style={{
+              whiteSpace: 'pre-wrap',
+              wordBreak: 'break-word',
+              margin: 0,
+              fontSize: 13,
+              lineHeight: 1.4,
+            }}
+          >
+            {this.state.errorMessage}
+          </pre>
+          <div style={{ color: '#cbd5e1', marginTop: 10, fontSize: 12 }}>
+            Hard refresh after deploy. If this persists, send this exact message.
+          </div>
+        </div>
+      );
+    }
+    return this.props.children;
+  }
+}
 
 type CustomCompareMarket = {
   id: string;
@@ -1089,11 +1146,11 @@ function ChartContent({
           const datePart = date && Number.isFinite(date.getTime()) ? date.toLocaleDateString() : null;
           return datePart ? `${h.title} (${datePart})` : h.title;
         })
-        .join('   â€¢   ');
-      return `${base}   â€¢   ${headlineText}`;
+        .join('   •   ');
+      return `${base}   •   ${headlineText}`;
     }
-    if (headlinesQuery.isLoading) return `${base}   â€¢   LOADING POLITICAL HEADLINES`;
-    if (headlinesQuery.isError) return `${base}   â€¢   HEADLINES TEMPORARILY UNAVAILABLE`;
+    if (headlinesQuery.isLoading) return `${base}   •   LOADING POLITICAL HEADLINES`;
+    if (headlinesQuery.isError) return `${base}   •   HEADLINES TEMPORARILY UNAVAILABLE`;
     return base;
   }, [headlines, headlinesQuery.isError, headlinesQuery.isLoading, liveVolume, latestCandle]);
 
@@ -2091,7 +2148,7 @@ function ChartContent({
               {marketTitle || 'Will Democrats Win the House of Representatives?'}
             </h3>
             <p style={{ margin: '4px 0 0 0', color: '#94a3b8', fontSize: 12, fontWeight: 600, textAlign: 'center' }}>
-              {marketId} Â· project by{' '}
+              {marketId} · project by{' '}
               <a
                 href="https://www.linkedin.com/in/tanner-lux-0ba791173/"
                 target="_blank"
@@ -2676,9 +2733,12 @@ export default function KalshiMarketPriceChart(props: KalshiMarketPriceChartProp
 
   return (
     <QueryClientProvider client={clientRef.current}>
-      <ChartContent {...props} />
+      <ChartErrorBoundary>
+        <ChartContent {...props} />
+      </ChartErrorBoundary>
     </QueryClientProvider>
   );
 }
+
 
 
